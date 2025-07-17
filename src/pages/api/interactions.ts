@@ -36,6 +36,41 @@ async function getMostRecentList() {
   return sortedLists[0].id;
 }
 
+// Function to get member info by ID
+async function getMemberById(memberId: string) {
+  try {
+    // Get the most recent list first
+    const listId = await getMostRecentList();
+
+    // Get members from the list
+    const res = await fetch(`${CLICKUP_BASE}/list/${listId}/member`, {
+      method: "GET",
+      headers: {
+        Authorization: process.env.CLICKUP_TOKEN!,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      return null;
+    }
+
+    const data = await res.json();
+
+    if (data.members && data.members.length > 0) {
+      const member = data.members.find(
+        (m: any) => m.id.toString() === memberId
+      );
+      return member ? member.username : null;
+    }
+
+    return null;
+  } catch (error) {
+    console.error("Error fetching member by ID:", error);
+    return null;
+  }
+}
+
 async function createClickUpTask(
   listId: string,
   {
@@ -152,13 +187,14 @@ export default async function handler(
     const desc = opts.description!;
     const assigneeId = opts.assignee; // Optional assignee
     const selectedListId = opts.list; // Optional list selection
+    const createdById = opts.created_by; // Optional created by selection
     const priorityMap = { Low: 4, Normal: 3, High: 2, Urgent: 1 };
     const priorityNum =
       priorityMap[priorityStr as keyof typeof priorityMap] ?? 3;
 
-    // Extract Discord user info for "created by"
+    // Extract Discord user info for fallback "created by"
     const discordUser = payload.member?.user || payload.user;
-    const createdBy = discordUser
+    const discordUserInfo = discordUser
       ? `${discordUser.username}${
           discordUser.discriminator !== "0"
             ? `#${discordUser.discriminator}`
@@ -167,6 +203,23 @@ export default async function handler(
       : "Unknown Discord User";
 
     try {
+      // Determine created by information
+      let createdBy: string | undefined;
+
+      if (createdById && createdById !== "unassigned") {
+        // Look up the selected team member
+        const memberName = await getMemberById(createdById);
+        if (memberName) {
+          createdBy = `${memberName} (ClickUp Member)`;
+        } else {
+          createdBy = `User ID: ${createdById} (ClickUp Member)`;
+        }
+      } else if (!createdById) {
+        // Default behavior: use Discord user info
+        createdBy = discordUserInfo;
+      }
+      // If createdById is "unassigned", createdBy remains undefined
+
       // Use selected list or get the most recent list as fallback
       let listId: string;
       if (selectedListId && selectedListId !== "default") {

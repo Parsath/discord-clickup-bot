@@ -181,6 +181,13 @@ const handler: NextApiHandler = async (req, res) => {
             .setDescription("Assign the ticket to a team member")
             .setRequired(false)
             .addChoices(...assigneeChoices)
+        )
+        .addStringOption((o: any) =>
+          o
+            .setName("created_by")
+            .setDescription("Who is this ticket created by/for")
+            .setRequired(false)
+            .addChoices(...assigneeChoices)
         ),
     ].map((cmd) => cmd.toJSON());
 

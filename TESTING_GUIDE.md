@@ -76,7 +76,7 @@ Tests ticket creation with all parameters:
 - **Description**: "The login form is not working properly"
 - **Tag**: "back-end" (required dropdown selection)
 - **Priority**: "Urgent" (required dropdown selection)
-- **Created by**: Extracted from Discord user info
+- **Created by**: Extracted from Discord user info (automatic)
 
 **Expected Response**:
 
@@ -84,7 +84,7 @@ Tests ticket creation with all parameters:
 {
   "type": 4,
   "data": {
-    "content": "✅ Ticket created: https://app.clickup.com/t/...\n📋 Created in default list (most recent)"
+    "content": "✅ Ticket created: https://app.clickup.com/t/...\n📋 Created in default list (most recent)\n😏 3mor at your service"
   }
 }
 ```
@@ -98,7 +98,7 @@ Tests ticket creation with assignee:
 - **Tag**: "front-end"
 - **Priority**: "Normal"
 - **Assignee**: "user1" (from workspace members)
-- **Created by**: "projectmanager#0002 (Discord ID: 987654321)"
+- **Created by**: "projectmanager#0002 (Discord ID: 987654321)" (automatic)
 
 **Expected Response**:
 
@@ -106,7 +106,7 @@ Tests ticket creation with assignee:
 {
   "type": 4,
   "data": {
-    "content": "✅ Ticket created: https://app.clickup.com/t/...\n👤 Assigned to user ID: user1\n📋 Created in default list (most recent)"
+    "content": "✅ Ticket created: https://app.clickup.com/t/...\n👤 Assigned to user ID: user1\n📋 Created in default list (most recent)\n😏 3mor at your service"
   }
 }
 ```
@@ -121,7 +121,7 @@ Tests ticket creation with specific list/sprint selection:
 - **Priority**: "High"
 - **List**: "901234567890" (specific list ID)
 - **Assignee**: "user2"
-- **Created by**: "developer#0003 (Discord ID: 555666777)"
+- **Created by**: "developer#0003 (Discord ID: 555666777)" (automatic)
 
 **Expected Response**:
 
@@ -129,16 +129,49 @@ Tests ticket creation with specific list/sprint selection:
 {
   "type": 4,
   "data": {
-    "content": "✅ Ticket created: https://app.clickup.com/t/...\n👤 Assigned to user ID: user2\n📋 Created in selected list: 901234567890"
+    "content": "✅ Ticket created: https://app.clickup.com/t/...\n👤 Assigned to user ID: user2\n📋 Created in selected list: 901234567890\n😏 3mor at your service"
   }
 }
 ```
 
-### 6. Create Ticket - Frontend High Priority
+### 6. Create Ticket - With Created By
+
+Tests ticket creation with manual "created by" selection:
+
+- **Title**: "API endpoint documentation"
+- **Description**: "Create documentation for new user management API endpoints"
+- **Tag**: "back-end"
+- **Priority**: "Normal"
+- **Assignee**: "user1"
+- **Created by**: "user2" (manually selected ClickUp member)
+- **Discord User**: "admin#0004" (who ran the command)
+
+**Expected Response**:
+
+```json
+{
+  "type": 4,
+  "data": {
+    "content": "✅ Ticket created: https://app.clickup.com/t/...\n👤 Assigned to user ID: user1\n📋 Created in default list (most recent)\n😏 3mor at your service"
+  }
+}
+```
+
+**Task Description Format:**
+
+```
+**Tag:** back-end
+**Priority:** Normal
+**Created by:** user2 (ClickUp Member)
+
+Create documentation for new user management API endpoints
+```
+
+### 7. Create Ticket - Frontend High Priority
 
 Tests frontend tickets with high priority.
 
-### 7. Create Ticket - Minimal Options (Defaults)
+### 8. Create Ticket - Minimal Options (Defaults)
 
 Tests with only required fields:
 
@@ -146,25 +179,38 @@ Tests with only required fields:
 - Uses default priority: "High"
 - No assignee (remains unassigned)
 - No list selected (uses most recent list)
+- No created_by selected (uses Discord user info)
 
-### 8. Create Ticket - Low Priority
+### 9. Create Ticket - Low Priority
 
 Tests low priority ticket creation.
 
-### 9. Invalid Signature Test
+### 10. Invalid Signature Test
 
 **Endpoint**: `POST /api/interactions` (production)
 
 - Tests signature verification
 - **Expected Response**: `401 - Invalid request signature`
 
-### 10. Unknown Command Test
+### 11. Unknown Command Test
 
 Tests handling of unknown commands.
 
 - **Expected Response**: `200` (fallback response)
 
 ## New Features
+
+### Created By Selection
+
+The bot now supports manually specifying who the ticket is created by/for:
+
+- **Created By Options**: Same dropdown as assignee (team members + special options)
+- **Special Values**:
+  - "Unassigned" - No created by info
+  - "Discord User (Auto)" - Use Discord user who ran command (default behavior)
+  - Team members - Use selected ClickUp member
+- **Default Behavior**: If not specified, uses Discord user info automatically
+- **Format**: ClickUp members show as "username (ClickUp Member)", Discord users as "username#discriminator (Discord ID: id)"
 
 ### List/Sprint Selection
 
@@ -186,12 +232,13 @@ The bot now supports assigning tickets to team members:
 
 ### Created By Tracking
 
-The bot automatically tracks who created each ticket:
+The bot automatically tracks who created each ticket with multiple options:
 
-- **Discord User Info**: Extracted from interaction payload
-- **Format**: `username#discriminator (Discord ID: id)`
+- **Automatic**: Discord user info extracted from interaction payload
+- **Manual**: Select any team member as "created by"
+- **Format**: `username (ClickUp Member)` or `username#discriminator (Discord ID: id)`
 - **Location**: Added to task description in ClickUp
-- **Fallback**: "Test User (Test Mode)" for test endpoint
+- **Flexibility**: Can represent tickets created on behalf of others
 
 ## Priority Mapping
 
@@ -216,12 +263,21 @@ Created tasks now include structured information:
 ```
 **Tag:** back-end
 **Priority:** Urgent
-**Created by:** testuser#0001 (Discord ID: 123456789)
+**Created by:** user2 (ClickUp Member)
 
 [User's description content]
 ```
 
 ## Testing ClickUp Integration
+
+### Verify Created By Options
+
+1. Run `POST /api/register` and check that "created_by" options include team members
+2. Create a ticket with different created_by selections:
+   - "Discord User (Auto)" - should use Discord user info
+   - Team member - should use member name with "(ClickUp Member)"
+   - "Unassigned" - should have no created by info
+3. Verify the task description shows correct created by information
 
 ### Verify List Selection
 
@@ -272,13 +328,18 @@ The bot automatically detects all lists in your folder. Verify this works by:
 
 ### 5. No Members Found
 
-- **Problem**: Only "Unassigned" option in assignee dropdown
+- **Problem**: Only "Unassigned" and "Discord User (Auto)" options in dropdowns
 - **Solution**: Ensure your lists have members with access
 
 ### 6. Assignment Failed
 
 - **Problem**: Task created but not assigned
 - **Solution**: Check user ID is valid and user has access to the workspace
+
+### 7. Created By Not Working
+
+- **Problem**: Created by info not showing correctly
+- **Solution**: Verify member IDs are valid and users exist in the workspace
 
 ## Production Testing
 
@@ -290,6 +351,7 @@ For production testing with real Discord interactions:
 4. **Monitor logs** for any errors
 5. **Verify assignments** work with real workspace members
 6. **Test list selection** with real sprints
+7. **Test created by** options with real team members
 
 ## Security Notes
 
@@ -310,6 +372,7 @@ You can modify the Postman requests to test edge cases:
 - Invalid priority/tag values
 - Invalid assignee IDs
 - Invalid list IDs
+- Invalid created_by IDs
 - Users without workspace access
 
 ### Load Testing
@@ -335,9 +398,18 @@ If you're having issues with list options:
 
 ### Member Fetching Issues
 
-If you're having issues with assignee options:
+If you're having issues with assignee/created_by options:
 
 1. **Check List Access**: Ensure lists have members with proper access
 2. **Verify Token Permissions**: Ensure your token has access to list members
 3. **Test API Call**: Manually call `GET /list/{list_id}/member` to see available members
 4. **Check Console Logs**: Look for "list members data" and "processed members" logs
+
+### Created By Issues
+
+If created by information isn't working correctly:
+
+1. **Check Member Lookup**: Verify `getMemberById` function can find users
+2. **Test Different Options**: Try "Discord User (Auto)", team members, and "Unassigned"
+3. **Verify Task Description**: Check that created by info appears in ClickUp task description
+4. **Console Logs**: Look for member lookup and created by determination logs
