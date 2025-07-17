@@ -23,8 +23,6 @@ async function getMostRecentList() {
   }
 
   const data = await res.json();
-  console.log("data");
-  console.log(data);
   const lists = data.lists;
 
   if (!lists || lists.length === 0) {

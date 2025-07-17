@@ -96,6 +96,18 @@ export default async function handler(
       process.env.DISCORD_PUBLIC_KEY!,
       ts
     );
+
+    console.log("isValid", isValid);
+    console.log("sig", sig);
+    console.log("ts", ts);
+    console.log("raw", raw);
+    console.log(
+      "process.env.DISCORD_PUBLIC_KEY",
+      process.env.DISCORD_PUBLIC_KEY
+    );
+    console.log("process.env.DISCORD_TOKEN", process.env.DISCORD_TOKEN);
+    console.log("process.env.DISCORD_CLIENT_ID", process.env.DISCORD_CLIENT_ID);
+    console.log("process.env.CLICKUP_TOKEN", process.env.CLICKUP_TOKEN);
     if (!isValid) {
       return res.status(401).send("Invalid request signature");
     }
