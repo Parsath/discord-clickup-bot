@@ -10,7 +10,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 export const config = { api: { bodyParser: false } };
 
 const CLICKUP_BASE = "https://api.clickup.com/api/v2";
-const FOLDER_ID = "90123062857";
+const FOLDER_ID = process.env.CLICKUP_FOLDER_ID!;
 
 async function getMostRecentList() {
   const res = await fetch(`${CLICKUP_BASE}/folder/${FOLDER_ID}/list`, {
