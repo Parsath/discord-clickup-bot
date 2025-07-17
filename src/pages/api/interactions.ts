@@ -70,13 +70,36 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  // Handle GET requests for health checks
+  if (req.method === "GET") {
+    return res
+      .status(200)
+      .json({ message: "Discord interactions endpoint is live" });
+  }
+
+  // Only accept POST requests for interactions
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
   const sig = req.headers["x-signature-ed25519"] as string;
   const ts = req.headers["x-signature-timestamp"] as string;
+
+  // Check for required headers
+  if (!sig || !ts) {
+    return res.status(400).json({ error: "Missing required Discord headers" });
+  }
+
   const raw = (await getRawBody(req)).toString();
 
   // 1) Verify Discord signature
-  if (!verifyKey(raw, sig, process.env.DISCORD_PUBLIC_KEY!, ts)) {
-    return res.status(401).send("Invalid request signature");
+  try {
+    if (!verifyKey(raw, sig, process.env.DISCORD_PUBLIC_KEY!, ts)) {
+      return res.status(401).send("Invalid request signature");
+    }
+  } catch (error) {
+    console.error("Signature verification error:", error);
+    return res.status(401).send("Signature verification failed");
   }
 
   const payload = JSON.parse(raw);
