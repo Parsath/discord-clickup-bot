@@ -69,20 +69,29 @@ Import the `discord-bot-test-collection.json` file into Postman.
 Tests ticket creation with all parameters:
 
 - **Title**: "Fix login bug"
-- **Description**: "Users can't log in with their email address. Getting 500 error."
-- **Tag**: "back-end"
-- **Priority**: "Urgent"
+- **Tag**: "back-end" (required dropdown selection)
+- **Priority**: "Urgent" (required dropdown selection)
 
-**Expected Response**:
+**Expected Response** (Modal):
 
 ```json
 {
-  "type": 4,
+  "type": 9,
   "data": {
-    "content": "✅ Ticket created: https://app.clickup.com/t/..."
+    "custom_id": "ticket_modal_back-end_Urgent_...",
+    "title": "Create Ticket - Description Details",
+    "components": [...]
   }
 }
 ```
+
+**Note**: This opens a modal with structured description fields:
+
+- **General Description** (required)
+- **Request** (optional) - What is being requested
+- **Method** (optional) - HTTP method for API endpoints
+- **Payload** (optional) - Request/response payload structure
+- **Expected Response** (optional) - Expected response format
 
 ### 4. Create Ticket - Frontend High Priority
 
@@ -116,14 +125,27 @@ Tests handling of unknown commands.
 
 The bot maps priority strings to ClickUp priority numbers:
 
-- **Low**: 1
-- **High**: 2 (default)
-- **Urgent**: 3
+- **Low**: 4
+- **Normal**: 3
+- **High**: 2
+- **Urgent**: 1
 
 ## Tag Options
 
+Users must select from these required options:
+
 - **front-end**: For UI/UX related tickets
-- **back-end**: For server/API related tickets (default)
+- **back-end**: For server/API related tickets
+
+## Modal Structure
+
+When users run the `/ticket` command, they get a modal with:
+
+1. **General Description** (required): Basic description of the issue
+2. **Request** (optional): What is being requested
+3. **Method** (optional): HTTP method (GET, POST, PUT, DELETE, etc.)
+4. **Payload** (optional): Request/response payload structure
+5. **Expected Response** (optional): Expected response format or behavior
 
 ## Testing ClickUp Integration
 

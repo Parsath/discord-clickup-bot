@@ -20,14 +20,24 @@ const commands = [
     .addStringOption((o: any) =>
       o
         .setName("tag")
-        .setDescription("front-end or back-end")
-        .setRequired(false)
+        .setDescription("Select the ticket category")
+        .setRequired(true)
+        .addChoices(
+          { name: "Front-end", value: "front-end" },
+          { name: "Back-end", value: "back-end" }
+        )
     )
     .addStringOption((o: any) =>
       o
         .setName("priority")
-        .setDescription("Low, Normal, High or Urgent")
-        .setRequired(false)
+        .setDescription("Select the ticket priority")
+        .setRequired(true)
+        .addChoices(
+          { name: "Low", value: "Low" },
+          { name: "Normal", value: "Normal" },
+          { name: "High", value: "High" },
+          { name: "Urgent", value: "Urgent" }
+        )
     ),
 ].map((cmd) => cmd.toJSON());
 

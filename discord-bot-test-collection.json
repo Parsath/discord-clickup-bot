@@ -94,7 +94,7 @@
         },
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"type\": 2,\n  \"data\": {\n    \"name\": \"ticket\",\n    \"options\": [\n      {\n        \"name\": \"title\",\n        \"value\": \"Fix login bug\"\n      },\n      {\n        \"name\": \"description\",\n        \"value\": \"Users can't log in with their email address. Getting 500 error.\"\n      },\n      {\n        \"name\": \"tag\",\n        \"value\": \"back-end\"\n      },\n      {\n        \"name\": \"priority\",\n        \"value\": \"Urgent\"\n      }\n    ]\n  }\n}"
+          "raw": "{\n  \"type\": 2,\n  \"data\": {\n    \"name\": \"ticket\",\n    \"options\": [\n      {\n        \"name\": \"title\",\n        \"value\": \"Fix login bug\"\n      },\n      {\n        \"name\": \"tag\",\n        \"value\": \"back-end\"\n      },\n      {\n        \"name\": \"priority\",\n        \"value\": \"Urgent\"\n      }\n    ]\n  }\n}"
         }
       },
       "response": []
@@ -124,13 +124,13 @@
         },
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"type\": 2,\n  \"data\": {\n    \"name\": \"ticket\",\n    \"options\": [\n      {\n        \"name\": \"title\",\n        \"value\": \"Update homepage design\"\n      },\n      {\n        \"name\": \"description\",\n        \"value\": \"The homepage needs to be updated with the new brand colors and layout according to the design mockups.\"\n      },\n      {\n        \"name\": \"tag\",\n        \"value\": \"front-end\"\n      },\n      {\n        \"name\": \"priority\",\n        \"value\": \"High\"\n      }\n    ]\n  }\n}"
+          "raw": "{\n  \"type\": 2,\n  \"data\": {\n    \"name\": \"ticket\",\n    \"options\": [\n      {\n        \"name\": \"title\",\n        \"value\": \"Update homepage design\"\n      },\n      {\n        \"name\": \"tag\",\n        \"value\": \"front-end\"\n      },\n      {\n        \"name\": \"priority\",\n        \"value\": \"High\"\n      }\n    ]\n  }\n}"
         }
       },
       "response": []
     },
     {
-      "name": "Create Ticket - Minimal Options (Defaults)",
+      "name": "Create Ticket - Normal Priority",
       "request": {
         "method": "POST",
         "header": [
@@ -154,7 +154,7 @@
         },
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"type\": 2,\n  \"data\": {\n    \"name\": \"ticket\",\n    \"options\": [\n      {\n        \"name\": \"title\",\n        \"value\": \"Database optimization\"\n      },\n      {\n        \"name\": \"description\",\n        \"value\": \"Need to optimize database queries for better performance.\"\n      }\n    ]\n  }\n}"
+          "raw": "{\n  \"type\": 2,\n  \"data\": {\n    \"name\": \"ticket\",\n    \"options\": [\n      {\n        \"name\": \"title\",\n        \"value\": \"Database optimization\"\n      },\n      {\n        \"name\": \"tag\",\n        \"value\": \"back-end\"\n      },\n      {\n        \"name\": \"priority\",\n        \"value\": \"Normal\"\n      }\n    ]\n  }\n}"
         }
       },
       "response": []
@@ -184,7 +184,7 @@
         },
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"type\": 2,\n  \"data\": {\n    \"name\": \"ticket\",\n    \"options\": [\n      {\n        \"name\": \"title\",\n        \"value\": \"Update documentation\"\n      },\n      {\n        \"name\": \"description\",\n        \"value\": \"API documentation needs to be updated with the latest endpoints.\"\n      },\n      {\n        \"name\": \"tag\",\n        \"value\": \"back-end\"\n      },\n      {\n        \"name\": \"priority\",\n        \"value\": \"Low\"\n      }\n    ]\n  }\n}"
+          "raw": "{\n  \"type\": 2,\n  \"data\": {\n    \"name\": \"ticket\",\n    \"options\": [\n      {\n        \"name\": \"title\",\n        \"value\": \"Update documentation\"\n      },\n      {\n        \"name\": \"tag\",\n        \"value\": \"back-end\"\n      },\n      {\n        \"name\": \"priority\",\n        \"value\": \"Low\"\n      }\n    ]\n  }\n}"
         }
       },
       "response": []
@@ -214,7 +214,7 @@
         },
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"type\": 2,\n  \"data\": {\n    \"name\": \"ticket\",\n    \"options\": [\n      {\n        \"name\": \"title\",\n        \"value\": \"Test ticket\"\n      },\n      {\n        \"name\": \"description\",\n        \"value\": \"This should fail due to invalid signature\"\n      }\n    ]\n  }\n}"
+          "raw": "{\n  \"type\": 2,\n  \"data\": {\n    \"name\": \"ticket\",\n    \"options\": [\n      {\n        \"name\": \"title\",\n        \"value\": \"Test ticket\"\n      },\n      {\n        \"name\": \"tag\",\n        \"value\": \"back-end\"\n      },\n      {\n        \"name\": \"priority\",\n        \"value\": \"Normal\"\n      }\n    ]\n  }\n}"
         }
       },
       "response": []
