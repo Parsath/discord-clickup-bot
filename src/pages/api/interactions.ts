@@ -81,8 +81,8 @@ export default async function handler(
     const isValid = await verifyKey(
       raw,
       sig,
-      process.env.DISCORD_PUBLIC_KEY!,
-      ts
+      ts,
+      process.env.DISCORD_PUBLIC_KEY!
     );
 
     console.log("isValid", isValid);
