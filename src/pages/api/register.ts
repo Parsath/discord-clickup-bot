@@ -13,15 +13,9 @@ const commands = [
     )
     .addStringOption((o: any) =>
       o
-        .setName("description")
-        .setDescription("Detailed description")
-        .setRequired(true)
-    )
-    .addStringOption((o: any) =>
-      o
         .setName("tag")
         .setDescription("Select the ticket category")
-        .setRequired(true)
+        .setRequired(false)
         .addChoices(
           { name: "Front-end", value: "front-end" },
           { name: "Back-end", value: "back-end" }
@@ -31,7 +25,7 @@ const commands = [
       o
         .setName("priority")
         .setDescription("Select the ticket priority")
-        .setRequired(true)
+        .setRequired(false)
         .addChoices(
           { name: "Low", value: "Low" },
           { name: "Normal", value: "Normal" },

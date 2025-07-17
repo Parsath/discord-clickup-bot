@@ -137,7 +137,7 @@ export default async function handler(
     return res.json({
       type: 9, // MODAL
       data: {
-        custom_id: `ticket_modal_${tag}_${priority}`,
+        custom_id: `ticket_modal:${tag}:${priority}`,
         title: "Create ClickUp Ticket",
         components: [
           {
@@ -180,11 +180,11 @@ export default async function handler(
     // MODAL_SUBMIT
     const customId = payload.data.custom_id;
 
-    if (customId.startsWith("ticket_modal_")) {
+    if (customId.startsWith("ticket_modal:")) {
       // Extract tag and priority from custom_id
-      const parts = customId.split("_");
-      const tag = parts[2] || "back-end";
-      const priority = parts[3] || "Normal";
+      const parts = customId.split(":");
+      const tag = parts[1] || "back-end";
+      const priority = parts[2] || "Normal";
 
       // Get form values
       const components = payload.data.components;
