@@ -97,12 +97,10 @@ async function getWorkspaceMembers() {
 
     // Extract members from the response
     if (data.members && data.members.length > 0) {
-      console.log("data.members", data.members);
       const filteredMembers = data.members.filter(
-        (member: any) => member.username
+        (member: any) => member.username && member.id
       );
 
-      console.log("filteredMembers", filteredMembers);
       const members = filteredMembers
         .slice(0, 24) // Discord limit is 25 choices, keep room for "Unassigned"
         .map((member: any) => {
