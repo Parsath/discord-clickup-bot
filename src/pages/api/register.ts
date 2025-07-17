@@ -6,20 +6,45 @@ const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN!);
 
 const CLICKUP_BASE = "https://api.clickup.com/api/v2";
 
+// Get most recent list (reusing logic from interactions.ts)
+async function getMostRecentList() {
+  const FOLDER_ID = process.env.CLICKUP_FOLDER_ID!;
+  const res = await fetch(`${CLICKUP_BASE}/folder/${FOLDER_ID}/list`, {
+    method: "GET",
+    headers: {
+      Authorization: process.env.CLICKUP_TOKEN!,
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch lists from folder (${res.status})`);
+  }
+
+  const data = await res.json();
+  const lists = data.lists;
+
+  if (!lists || lists.length === 0) {
+    throw new Error("No lists found in the folder");
+  }
+
+  // Sort lists by start_date (most recent first)
+  const sortedLists = lists.sort(
+    (a: any, b: any) => parseInt(b.start_date) - parseInt(a.start_date)
+  );
+
+  return sortedLists[0].id;
+}
+
 // Function to fetch workspace members from ClickUp
 async function getWorkspaceMembers() {
   try {
-    const teamId = process.env.CLICKUP_TEAM_ID;
-    if (!teamId) {
-      console.warn("CLICKUP_TEAM_ID not set, assignee options will be limited");
-      return [
-        { name: "Unassigned", value: "unassigned" },
-        { name: "User 1", value: "user1" },
-        { name: "User 2", value: "user2" },
-      ];
-    }
+    // Get the most recent list first
+    const listId = await getMostRecentList();
+    console.log("listId for members:", listId);
 
-    const res = await fetch(`${CLICKUP_BASE}/team/${teamId}/space`, {
+    // Get members from the list
+    const res = await fetch(`${CLICKUP_BASE}/list/${listId}/member`, {
       method: "GET",
       headers: {
         Authorization: process.env.CLICKUP_TOKEN!,
@@ -28,22 +53,24 @@ async function getWorkspaceMembers() {
     });
 
     if (!res.ok) {
-      console.error(`Failed to fetch spaces (${res.status})`);
+      console.error(`Failed to fetch list members (${res.status})`);
       return [{ name: "Unassigned", value: "unassigned" }];
     }
 
     const data = await res.json();
-    const spaces = data.spaces;
+    console.log("list members data:", data);
 
-    // Get members from the first space (workspace members)
-    if (spaces && spaces.length > 0 && spaces[0].members) {
-      const members = spaces[0].members
+    // Extract members from the response
+    if (data.members && data.members.length > 0) {
+      const members = data.members
         .filter((member: any) => member.user && member.user.username)
         .slice(0, 24) // Discord limit is 25 choices, keep room for "Unassigned"
         .map((member: any) => ({
           name: member.user.username,
           value: member.user.id.toString(),
         }));
+
+      console.log("processed members:", members);
 
       return [{ name: "Unassigned", value: "unassigned" }, ...members];
     }
