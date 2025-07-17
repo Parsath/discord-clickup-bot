@@ -130,6 +130,36 @@
       "response": []
     },
     {
+      "name": "Create Ticket - With List Selection",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-signature-ed25519",
+            "value": "mock_signature"
+          },
+          {
+            "key": "x-signature-timestamp",
+            "value": "{{$timestamp}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/interactions-test",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "interactions-test"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"type\": 2,\n  \"data\": {\n    \"name\": \"ticket\",\n    \"options\": [\n      {\n        \"name\": \"title\",\n        \"value\": \"Database migration script\"\n      },\n      {\n        \"name\": \"description\",\n        \"value\": \"Create migration script for user table updates\"\n      },\n      {\n        \"name\": \"tag\",\n        \"value\": \"back-end\"\n      },\n      {\n        \"name\": \"priority\",\n        \"value\": \"High\"\n      },\n      {\n        \"name\": \"list\",\n        \"value\": \"901234567890\"\n      },\n      {\n        \"name\": \"assignee\",\n        \"value\": \"user2\"\n      }\n    ]\n  },\n  \"user\": {\n    \"id\": \"555666777\",\n    \"username\": \"developer\",\n    \"discriminator\": \"0003\"\n  }\n}"
+        }
+      },
+      "response": []
+    },
+    {
       "name": "Create Ticket - Frontend High Priority",
       "request": {
         "method": "POST",

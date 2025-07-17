@@ -17,13 +17,12 @@ DISCORD_PUBLIC_KEY=your_public_key_here
 # ClickUp Settings
 CLICKUP_TOKEN=your_clickup_api_token_here
 CLICKUP_FOLDER_ID=90123062857
-CLICKUP_TEAM_ID=your_team_id_here
 
 # Development
 NODE_ENV=development
 ```
 
-**Note**: The `CLICKUP_TEAM_ID` is required for fetching workspace members for the assignee dropdown. You can find this in your ClickUp workspace URL or by calling the ClickUp API.
+**Note**: The bot will automatically fetch lists and workspace members from your existing ClickUp folder setup.
 
 ### 2. Start Your Development Server
 
@@ -59,6 +58,7 @@ Import the `discord-bot-test-collection.json` file into Postman.
 
 - Registers the `/ticket` slash command with Discord
 - Dynamically fetches workspace members for assignee options
+- Dynamically fetches all lists/sprints for list selection
 - **Expected Response**: `{"ok": true}`
 
 ### 2. Discord PING Test
@@ -84,7 +84,7 @@ Tests ticket creation with all parameters:
 {
   "type": 4,
   "data": {
-    "content": "✅ Ticket created: https://app.clickup.com/t/..."
+    "content": "✅ Ticket created: https://app.clickup.com/t/...\n📋 Created in default list (most recent)"
   }
 }
 ```
@@ -106,35 +106,59 @@ Tests ticket creation with assignee:
 {
   "type": 4,
   "data": {
-    "content": "✅ Ticket created: https://app.clickup.com/t/...\n👤 Assigned to user ID: user1"
+    "content": "✅ Ticket created: https://app.clickup.com/t/...\n👤 Assigned to user ID: user1\n📋 Created in default list (most recent)"
   }
 }
 ```
 
-### 5. Create Ticket - Frontend High Priority
+### 5. Create Ticket - With List Selection
+
+Tests ticket creation with specific list/sprint selection:
+
+- **Title**: "Database migration script"
+- **Description**: "Create migration script for user table updates"
+- **Tag**: "back-end"
+- **Priority**: "High"
+- **List**: "901234567890" (specific list ID)
+- **Assignee**: "user2"
+- **Created by**: "developer#0003 (Discord ID: 555666777)"
+
+**Expected Response**:
+
+```json
+{
+  "type": 4,
+  "data": {
+    "content": "✅ Ticket created: https://app.clickup.com/t/...\n👤 Assigned to user ID: user2\n📋 Created in selected list: 901234567890"
+  }
+}
+```
+
+### 6. Create Ticket - Frontend High Priority
 
 Tests frontend tickets with high priority.
 
-### 6. Create Ticket - Minimal Options (Defaults)
+### 7. Create Ticket - Minimal Options (Defaults)
 
 Tests with only required fields:
 
 - Uses default tag: "back-end"
 - Uses default priority: "High"
 - No assignee (remains unassigned)
+- No list selected (uses most recent list)
 
-### 7. Create Ticket - Low Priority
+### 8. Create Ticket - Low Priority
 
 Tests low priority ticket creation.
 
-### 8. Invalid Signature Test
+### 9. Invalid Signature Test
 
 **Endpoint**: `POST /api/interactions` (production)
 
 - Tests signature verification
 - **Expected Response**: `401 - Invalid request signature`
 
-### 9. Unknown Command Test
+### 10. Unknown Command Test
 
 Tests handling of unknown commands.
 
@@ -142,12 +166,21 @@ Tests handling of unknown commands.
 
 ## New Features
 
+### List/Sprint Selection
+
+The bot now supports selecting which list/sprint to create tickets in:
+
+- **List Options**: Dynamically fetched from your ClickUp folder
+- **Dropdown Choices**: Up to 24 lists/sprints with the most recent marked as "(Default)"
+- **Default Behavior**: If no list is selected, uses the most recent list automatically
+- **Response**: Shows which list was used (selected or default)
+
 ### Assignee Support
 
 The bot now supports assigning tickets to team members:
 
-- **Assignee Options**: Dynamically fetched from ClickUp workspace members
-- **Dropdown Choices**: Up to 25 members (Discord limit) plus "Unassigned" option
+- **Assignee Options**: Dynamically fetched from ClickUp list members
+- **Dropdown Choices**: Up to 25 members including "Unassigned" option
 - **Assignment**: Tasks are assigned in ClickUp when created
 - **Response**: Shows assigned user ID in Discord response
 
@@ -190,9 +223,12 @@ Created tasks now include structured information:
 
 ## Testing ClickUp Integration
 
-### Verify Team ID
+### Verify List Selection
 
-Test that your `CLICKUP_TEAM_ID` is correct by checking if assignee options are populated during command registration.
+1. Run `POST /api/register` and check console logs for available lists
+2. Create a ticket with a specific list selection
+3. Verify the task appears in the correct list in ClickUp
+4. Test fallback behavior by not selecting a list
 
 ### Check Assignee Assignment
 
@@ -200,17 +236,17 @@ Test that your `CLICKUP_TEAM_ID` is correct by checking if assignee options are 
 2. Verify the task is assigned in ClickUp
 3. Check that the response shows the assigned user
 
-### Verify Folder ID
+### Verify Folder Setup
 
-Test that your `CLICKUP_FOLDER_ID` is correct by checking if tickets are created in the right sprint.
+Test that your `CLICKUP_FOLDER_ID` is correct by checking if lists and tickets are created in the right folder.
 
-### Check List Selection
+### Check List Detection
 
-The bot automatically selects the most recently created list (sprint) in your folder. Verify this works by:
+The bot automatically detects all lists in your folder. Verify this works by:
 
-1. Creating a new sprint in ClickUp
-2. Running a ticket creation test
-3. Confirming the ticket appears in the newest sprint
+1. Creating a new sprint/list in ClickUp
+2. Running `POST /api/register` again
+3. Confirming the new list appears in the dropdown options
 
 ## Common Issues
 
@@ -224,20 +260,20 @@ The bot automatically selects the most recently created list (sprint) in your fo
 - **Problem**: `❌ Failed to create ticket: ClickUp API error (401)`
 - **Solution**: Check your `CLICKUP_TOKEN` environment variable
 
-### 3. Team ID Not Found
+### 3. No Lists Found
 
-- **Problem**: Limited assignee options or empty dropdown
-- **Solution**: Verify your `CLICKUP_TEAM_ID` is correct
+- **Problem**: Empty list dropdown or "Default List" only
+- **Solution**: Verify your `CLICKUP_FOLDER_ID` is correct and contains lists
 
 ### 4. Folder Not Found
 
 - **Problem**: `❌ Failed to create ticket: Failed to fetch lists from folder (404)`
 - **Solution**: Verify your `CLICKUP_FOLDER_ID` is correct
 
-### 5. No Lists in Folder
+### 5. No Members Found
 
-- **Problem**: `❌ Failed to create ticket: No lists found in the folder`
-- **Solution**: Create at least one list (sprint) in your ClickUp folder
+- **Problem**: Only "Unassigned" option in assignee dropdown
+- **Solution**: Ensure your lists have members with access
 
 ### 6. Assignment Failed
 
@@ -253,6 +289,7 @@ For production testing with real Discord interactions:
 3. **Test via Discord** using the `/ticket` slash command
 4. **Monitor logs** for any errors
 5. **Verify assignments** work with real workspace members
+6. **Test list selection** with real sprints
 
 ## Security Notes
 
@@ -272,6 +309,7 @@ You can modify the Postman requests to test edge cases:
 - Missing required fields
 - Invalid priority/tag values
 - Invalid assignee IDs
+- Invalid list IDs
 - Users without workspace access
 
 ### Load Testing
@@ -284,11 +322,22 @@ For production load testing, consider using tools like:
 
 But remember to generate proper Discord signatures for realistic load tests.
 
-## Troubleshooting Team Member Fetching
+## Troubleshooting
+
+### List Fetching Issues
+
+If you're having issues with list options:
+
+1. **Check Folder ID**: Verify your `CLICKUP_FOLDER_ID` is correct
+2. **Verify Token Permissions**: Ensure your token has access to the folder
+3. **Test API Call**: Manually call `GET /folder/{folder_id}/list` to see available lists
+4. **Check Console Logs**: Look for "Available lists" and "List choices" in console output
+
+### Member Fetching Issues
 
 If you're having issues with assignee options:
 
-1. **Check Team ID**: Use the ClickUp API to verify your team ID
-2. **Verify Token Permissions**: Ensure your token has access to workspace members
-3. **Test API Call**: Manually call `GET /team/{team_id}/space` to see available members
-4. **Check Console Logs**: Look for warnings about missing CLICKUP_TEAM_ID
+1. **Check List Access**: Ensure lists have members with proper access
+2. **Verify Token Permissions**: Ensure your token has access to list members
+3. **Test API Call**: Manually call `GET /list/{list_id}/member` to see available members
+4. **Check Console Logs**: Look for "list members data" and "processed members" logs

@@ -151,6 +151,7 @@ export default async function handler(
     const priorityStr = opts.priority || "Normal";
     const desc = opts.description!;
     const assigneeId = opts.assignee; // Optional assignee
+    const selectedListId = opts.list; // Optional list selection
     const priorityMap = { Low: 4, Normal: 3, High: 2, Urgent: 1 };
     const priorityNum =
       priorityMap[priorityStr as keyof typeof priorityMap] ?? 3;
@@ -166,8 +167,15 @@ export default async function handler(
       : "Unknown Discord User";
 
     try {
-      // Get the most recent list ID dynamically
-      const listId = await getMostRecentList();
+      // Use selected list or get the most recent list as fallback
+      let listId: string;
+      if (selectedListId && selectedListId !== "default") {
+        listId = selectedListId;
+        console.log("Using selected list:", listId);
+      } else {
+        listId = await getMostRecentList();
+        console.log("Using most recent list (fallback):", listId);
+      }
 
       const task = await createClickUpTask(listId, {
         name: title,
@@ -182,6 +190,11 @@ export default async function handler(
       let responseContent = `✅ Ticket created: ${task.url}`;
       if (assigneeId && assigneeId !== "unassigned") {
         responseContent += `\n👤 Assigned to user ID: ${assigneeId}`;
+      }
+      if (selectedListId && selectedListId !== "default") {
+        responseContent += `\n📋 Created in selected list: ${selectedListId}`;
+      } else {
+        responseContent += `\n📋 Created in default list (most recent)`;
       }
 
       return res.json({
