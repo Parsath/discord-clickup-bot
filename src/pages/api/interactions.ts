@@ -84,18 +84,6 @@ export default async function handler(
       ts,
       process.env.DISCORD_PUBLIC_KEY!
     );
-
-    console.log("isValid", isValid);
-    console.log("sig", sig);
-    console.log("ts", ts);
-    console.log("raw", raw);
-    console.log(
-      "process.env.DISCORD_PUBLIC_KEY",
-      process.env.DISCORD_PUBLIC_KEY
-    );
-    console.log("process.env.DISCORD_TOKEN", process.env.DISCORD_TOKEN);
-    console.log("process.env.DISCORD_CLIENT_ID", process.env.DISCORD_CLIENT_ID);
-    console.log("process.env.CLICKUP_TOKEN", process.env.CLICKUP_TOKEN);
     if (!isValid) {
       return res.status(401).send("Invalid request signature");
     }
@@ -122,108 +110,45 @@ export default async function handler(
     return res.json({ type: 1 });
   }
 
-  // 3) Slash command - Show modal for description input
+  // 3) Slash command
   if (payload.type === 2 && payload.data.name === "ticket") {
-    const opts = (payload.data.options || []).reduce((acc: any, o: any) => {
+    const opts = (payload.data.options as any[]).reduce((acc, o) => {
       acc[o.name] = o.value;
       return acc;
     }, {} as Record<string, string>);
 
     const title = opts.title!;
     const tag = opts.tag || "back-end";
-    const priority = opts.priority || "Normal";
+    const priorityStr = opts.priority || "Normal";
+    const desc = opts.description!;
+    const priorityMap = { Low: 4, Normal: 3, High: 2, Urgent: 1 };
+    const priorityNum =
+      priorityMap[priorityStr as keyof typeof priorityMap] ?? 3;
 
-    // Show modal with large text area for description
-    return res.json({
-      type: 9, // MODAL
-      data: {
-        custom_id: `ticket_modal:${tag}:${priority}`,
-        title: "Create ClickUp Ticket",
-        components: [
-          {
-            type: 1, // ACTION_ROW
-            components: [
-              {
-                type: 4, // TEXT_INPUT
-                custom_id: "ticket_title",
-                label: "Ticket Title",
-                style: 1, // SHORT
-                value: title,
-                required: true,
-                max_length: 256,
-              },
-            ],
-          },
-          {
-            type: 1, // ACTION_ROW
-            components: [
-              {
-                type: 4, // TEXT_INPUT
-                custom_id: "ticket_description",
-                label: "Detailed Description",
-                style: 2, // PARAGRAPH (allows multiple lines and much more text)
-                placeholder:
-                  "Enter detailed description including:\n• Request/Response payloads\n• API endpoints\n• Headers\n• Expected behavior\n• Error details\n• Any other technical details...",
-                required: true,
-                min_length: 10,
-                max_length: 4000, // Much larger limit for detailed technical descriptions
-              },
-            ],
-          },
-        ],
-      },
-    });
-  }
+    try {
+      // Get the most recent list ID dynamically
+      const listId = await getMostRecentList();
 
-  // 4) Modal submission - Create the ticket
-  if (payload.type === 5) {
-    // MODAL_SUBMIT
-    const customId = payload.data.custom_id;
+      const task = await createClickUpTask(listId, {
+        name: title,
+        description: `**Tag:** ${tag}\n**Priority:** ${priorityStr}\n\n${desc}`,
+        tag,
+        priority: priorityNum,
+      });
 
-    if (customId.startsWith("ticket_modal:")) {
-      // Extract tag and priority from custom_id
-      const parts = customId.split(":");
-      const tag = parts[1] || "back-end";
-      const priority = parts[2] || "Normal";
-
-      // Get form values
-      const components = payload.data.components;
-      const titleComponent = components[0]?.components[0];
-      const descriptionComponent = components[1]?.components[0];
-
-      const title = titleComponent?.value || "Untitled Ticket";
-      const description =
-        descriptionComponent?.value || "No description provided";
-
-      const priorityMap = { Low: 4, Normal: 3, High: 2, Urgent: 1 };
-      const priorityNum =
-        priorityMap[priority as keyof typeof priorityMap] ?? 3;
-
-      try {
-        // Get the most recent list ID dynamically
-        const listId = await getMostRecentList();
-
-        const task = await createClickUpTask(listId, {
-          name: title,
-          description: `**Tag:** ${tag}\n**Priority:** ${priority}\n\n${description}`,
-          tag,
-          priority: priorityNum,
-        });
-
-        // Respond to Discord
-        return res.json({
-          type: 4, // CHANNEL_MESSAGE_WITH_SOURCE
-          data: {
-            content: `✅ Ticket created: ${task.url}`,
-          },
-        });
-      } catch (err: any) {
-        console.error(err);
-        return res.json({
-          type: 4,
-          data: { content: `❌ Failed to create ticket: ${err.message}` },
-        });
-      }
+      // 4) Respond to Discord
+      return res.json({
+        type: 4, // CHANNEL_MESSAGE_WITH_SOURCE
+        data: {
+          content: `✅ Ticket created: ${task.url}`,
+        },
+      });
+    } catch (err: any) {
+      console.error(err);
+      return res.json({
+        type: 4,
+        data: { content: `❌ Failed to create ticket: ${err.message}` },
+      });
     }
   }
 
