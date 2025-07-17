@@ -196,6 +196,8 @@ export default async function handler(
       } else {
         responseContent += `\n📋 Created in default list (most recent)`;
       }
+      //  Add playful line saying 3mor at your service
+      responseContent += `\n😏 3mor at your service`;
 
       return res.json({
         type: 4, // CHANNEL_MESSAGE_WITH_SOURCE
