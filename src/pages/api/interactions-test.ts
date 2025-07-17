@@ -44,22 +44,51 @@ async function createClickUpTask(
     description,
     tag,
     priority,
-  }: { name: string; description: string; tag: string; priority: number }
+    assigneeId,
+    createdBy,
+  }: {
+    name: string;
+    description: string;
+    tag: string;
+    priority: number;
+    assigneeId?: string;
+    createdBy?: string;
+  }
 ) {
+  // Build task description with created by info
+  let taskDescription = `**Tag:** ${tag}\n**Priority:** ${priority}\n`;
+  if (createdBy) {
+    taskDescription += `**Created by:** ${createdBy}\n`;
+  }
+  taskDescription += `\n${description}`;
+
+  // Build request body
+  const taskData: any = {
+    name,
+    description: taskDescription,
+    tags: [tag],
+    priority,
+  };
+
+  // Add assignees if specified and not "unassigned"
+  if (assigneeId && assigneeId !== "unassigned") {
+    taskData.assignees = [parseInt(assigneeId)];
+  }
+
   const res = await fetch(`${CLICKUP_BASE}/list/${listId}/task`, {
     method: "POST",
     headers: {
       Authorization: process.env.CLICKUP_TOKEN!,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      name,
-      description,
-      tags: [tag],
-      priority,
-    }),
+    body: JSON.stringify(taskData),
   });
-  if (!res.ok) throw new Error(`ClickUp API error (${res.status})`);
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(`ClickUp API error (${res.status}): ${errorText}`);
+  }
+
   return res.json();
 }
 
@@ -102,9 +131,20 @@ export default async function handler(
     const tag = opts.tag || "back-end";
     const priorityStr = opts.priority || "High";
     const desc = opts.description!;
+    const assigneeId = opts.assignee; // Optional assignee
     const priorityMap = { Low: 4, Normal: 3, High: 2, Urgent: 1 };
     const priorityNum =
       priorityMap[priorityStr as keyof typeof priorityMap] ?? 2;
+
+    // Extract Discord user info for "created by" (for testing, use mock data if not available)
+    const discordUser = payload.member?.user || payload.user;
+    const createdBy = discordUser
+      ? `${discordUser.username}${
+          discordUser.discriminator !== "0"
+            ? `#${discordUser.discriminator}`
+            : ""
+        } (Discord ID: ${discordUser.id})`
+      : "Test User (Test Mode)";
 
     try {
       // Get the most recent list ID dynamically
@@ -112,16 +152,23 @@ export default async function handler(
 
       const task = await createClickUpTask(listId, {
         name: title,
-        description: `**Tag:** ${tag}\n**Priority:** ${priorityStr}\n\n${desc}`,
+        description: desc,
         tag,
         priority: priorityNum,
+        assigneeId,
+        createdBy,
       });
 
       // 4) Respond to Discord
+      let responseContent = `✅ Ticket created: ${task.url}`;
+      if (assigneeId && assigneeId !== "unassigned") {
+        responseContent += `\n👤 Assigned to user ID: ${assigneeId}`;
+      }
+
       return res.json({
         type: 4, // CHANNEL_MESSAGE_WITH_SOURCE
         data: {
-          content: `✅ Ticket created: ${task.url}`,
+          content: responseContent,
         },
       });
     } catch (err: any) {

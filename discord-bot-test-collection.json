@@ -94,7 +94,37 @@
         },
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"type\": 2,\n  \"data\": {\n    \"name\": \"ticket\",\n    \"options\": [\n      {\n        \"name\": \"title\",\n        \"value\": \"Fix login bug\"\n      },\n      {\n        \"name\": \"tag\",\n        \"value\": \"back-end\"\n      },\n      {\n        \"name\": \"priority\",\n        \"value\": \"Urgent\"\n      }\n    ]\n  }\n}"
+          "raw": "{\n  \"type\": 2,\n  \"data\": {\n    \"name\": \"ticket\",\n    \"options\": [\n      {\n        \"name\": \"title\",\n        \"value\": \"Fix login bug\"\n      },\n      {\n        \"name\": \"description\",\n        \"value\": \"The login form is not working properly\"\n      },\n      {\n        \"name\": \"tag\",\n        \"value\": \"back-end\"\n      },\n      {\n        \"name\": \"priority\",\n        \"value\": \"Urgent\"\n      }\n    ]\n  },\n  \"user\": {\n    \"id\": \"123456789\",\n    \"username\": \"testuser\",\n    \"discriminator\": \"0001\"\n  }\n}"
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Ticket - With Assignee",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-signature-ed25519",
+            "value": "mock_signature"
+          },
+          {
+            "key": "x-signature-timestamp",
+            "value": "{{$timestamp}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/interactions-test",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "interactions-test"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"type\": 2,\n  \"data\": {\n    \"name\": \"ticket\",\n    \"options\": [\n      {\n        \"name\": \"title\",\n        \"value\": \"Update user profile page\"\n      },\n      {\n        \"name\": \"description\",\n        \"value\": \"Need to add new fields to the user profile\"\n      },\n      {\n        \"name\": \"tag\",\n        \"value\": \"front-end\"\n      },\n      {\n        \"name\": \"priority\",\n        \"value\": \"Normal\"\n      },\n      {\n        \"name\": \"assignee\",\n        \"value\": \"user1\"\n      }\n    ]\n  },\n  \"user\": {\n    \"id\": \"987654321\",\n    \"username\": \"projectmanager\",\n    \"discriminator\": \"0002\"\n  }\n}"
         }
       },
       "response": []
@@ -124,7 +154,7 @@
         },
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"type\": 2,\n  \"data\": {\n    \"name\": \"ticket\",\n    \"options\": [\n      {\n        \"name\": \"title\",\n        \"value\": \"Update homepage design\"\n      },\n      {\n        \"name\": \"tag\",\n        \"value\": \"front-end\"\n      },\n      {\n        \"name\": \"priority\",\n        \"value\": \"High\"\n      }\n    ]\n  }\n}"
+          "raw": "{\n  \"type\": 2,\n  \"data\": {\n    \"name\": \"ticket\",\n    \"options\": [\n      {\n        \"name\": \"title\",\n        \"value\": \"Update homepage design\"\n      },\n      {\n        \"name\": \"description\",\n        \"value\": \"Redesign the homepage layout\"\n      },\n      {\n        \"name\": \"tag\",\n        \"value\": \"front-end\"\n      },\n      {\n        \"name\": \"priority\",\n        \"value\": \"High\"\n      }\n    ]\n  }\n}"
         }
       },
       "response": []
@@ -154,7 +184,7 @@
         },
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"type\": 2,\n  \"data\": {\n    \"name\": \"ticket\",\n    \"options\": [\n      {\n        \"name\": \"title\",\n        \"value\": \"Database optimization\"\n      },\n      {\n        \"name\": \"tag\",\n        \"value\": \"back-end\"\n      },\n      {\n        \"name\": \"priority\",\n        \"value\": \"Normal\"\n      }\n    ]\n  }\n}"
+          "raw": "{\n  \"type\": 2,\n  \"data\": {\n    \"name\": \"ticket\",\n    \"options\": [\n      {\n        \"name\": \"title\",\n        \"value\": \"Database optimization\"\n      },\n      {\n        \"name\": \"description\",\n        \"value\": \"Optimize database queries for better performance\"\n      },\n      {\n        \"name\": \"tag\",\n        \"value\": \"back-end\"\n      },\n      {\n        \"name\": \"priority\",\n        \"value\": \"Normal\"\n      }\n    ]\n  }\n}"
         }
       },
       "response": []
@@ -184,7 +214,7 @@
         },
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"type\": 2,\n  \"data\": {\n    \"name\": \"ticket\",\n    \"options\": [\n      {\n        \"name\": \"title\",\n        \"value\": \"Update documentation\"\n      },\n      {\n        \"name\": \"tag\",\n        \"value\": \"back-end\"\n      },\n      {\n        \"name\": \"priority\",\n        \"value\": \"Low\"\n      }\n    ]\n  }\n}"
+          "raw": "{\n  \"type\": 2,\n  \"data\": {\n    \"name\": \"ticket\",\n    \"options\": [\n      {\n        \"name\": \"title\",\n        \"value\": \"Update documentation\"\n      },\n      {\n        \"name\": \"description\",\n        \"value\": \"Update API documentation with new endpoints\"\n      },\n      {\n        \"name\": \"tag\",\n        \"value\": \"back-end\"\n      },\n      {\n        \"name\": \"priority\",\n        \"value\": \"Low\"\n      }\n    ]\n  }\n}"
         }
       },
       "response": []
