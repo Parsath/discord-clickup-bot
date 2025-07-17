@@ -1,9 +1,5 @@
 // pages/api/interactions.ts
 import { verifyKey } from "discord-interactions";
-import {
-  Routes,
-  RESTPostAPIChatInputApplicationCommandsJSONBody,
-} from "discord.js";
 import getRawBody from "raw-body";
 import type { NextApiRequest, NextApiResponse } from "next";
 
@@ -94,7 +90,13 @@ export default async function handler(
 
   // 1) Verify Discord signature
   try {
-    if (!verifyKey(raw, sig, process.env.DISCORD_PUBLIC_KEY!, ts)) {
+    const isValid = await verifyKey(
+      raw,
+      sig,
+      process.env.DISCORD_PUBLIC_KEY!,
+      ts
+    );
+    if (!isValid) {
       return res.status(401).send("Invalid request signature");
     }
   } catch (error) {
