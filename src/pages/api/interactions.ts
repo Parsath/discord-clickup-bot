@@ -66,18 +66,6 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  // Handle GET requests for health checks
-  if (req.method === "GET") {
-    return res
-      .status(200)
-      .json({ message: "Discord interactions endpoint is live" });
-  }
-
-  // Only accept POST requests for interactions
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
-
   const sig = req.headers["x-signature-ed25519"] as string;
   const ts = req.headers["x-signature-timestamp"] as string;
 
@@ -114,6 +102,17 @@ export default async function handler(
   } catch (error) {
     console.error("Signature verification error:", error);
     return res.status(401).send("Signature verification failed");
+  }
+  // Handle GET requests for health checks
+  if (req.method === "GET") {
+    return res
+      .status(200)
+      .json({ message: "Discord interactions endpoint is live" });
+  }
+
+  // Only accept POST requests for interactions
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
   const payload = JSON.parse(raw);
