@@ -13,6 +13,12 @@ const commands = [
     )
     .addStringOption((o: any) =>
       o
+        .setName("description")
+        .setDescription("Detailed description")
+        .setRequired(true)
+    )
+    .addStringOption((o: any) =>
+      o
         .setName("tag")
         .setDescription("front-end or back-end")
         .setRequired(false)
@@ -22,12 +28,6 @@ const commands = [
         .setName("priority")
         .setDescription("Low, Normal, High or Urgent")
         .setRequired(false)
-    )
-    .addStringOption((o: any) =>
-      o
-        .setName("description")
-        .setDescription("Detailed description")
-        .setRequired(true)
     ),
 ].map((cmd) => cmd.toJSON());
 

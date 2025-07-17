@@ -1,0 +1,265 @@
+{
+  "info": {
+    "name": "Discord ClickUp Bot Tests",
+    "description": "Test collection for Discord ClickUp ticket creation bot",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "discordPublicKey",
+      "value": "{{DISCORD_PUBLIC_KEY}}",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Register Discord Commands",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/register",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "register"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{}"
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Discord PING Test",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-signature-ed25519",
+            "value": "mock_signature"
+          },
+          {
+            "key": "x-signature-timestamp",
+            "value": "{{$timestamp}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/interactions-test",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "interactions-test"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"type\": 1\n}"
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Ticket - Full Options",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-signature-ed25519",
+            "value": "mock_signature"
+          },
+          {
+            "key": "x-signature-timestamp",
+            "value": "{{$timestamp}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/interactions-test",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "interactions-test"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"type\": 2,\n  \"data\": {\n    \"name\": \"ticket\",\n    \"options\": [\n      {\n        \"name\": \"title\",\n        \"value\": \"Fix login bug\"\n      },\n      {\n        \"name\": \"description\",\n        \"value\": \"Users can't log in with their email address. Getting 500 error.\"\n      },\n      {\n        \"name\": \"tag\",\n        \"value\": \"back-end\"\n      },\n      {\n        \"name\": \"priority\",\n        \"value\": \"Urgent\"\n      }\n    ]\n  }\n}"
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Ticket - Frontend High Priority",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-signature-ed25519",
+            "value": "mock_signature"
+          },
+          {
+            "key": "x-signature-timestamp",
+            "value": "{{$timestamp}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/interactions-test",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "interactions-test"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"type\": 2,\n  \"data\": {\n    \"name\": \"ticket\",\n    \"options\": [\n      {\n        \"name\": \"title\",\n        \"value\": \"Update homepage design\"\n      },\n      {\n        \"name\": \"description\",\n        \"value\": \"The homepage needs to be updated with the new brand colors and layout according to the design mockups.\"\n      },\n      {\n        \"name\": \"tag\",\n        \"value\": \"front-end\"\n      },\n      {\n        \"name\": \"priority\",\n        \"value\": \"High\"\n      }\n    ]\n  }\n}"
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Ticket - Minimal Options (Defaults)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-signature-ed25519",
+            "value": "mock_signature"
+          },
+          {
+            "key": "x-signature-timestamp",
+            "value": "{{$timestamp}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/interactions-test",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "interactions-test"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"type\": 2,\n  \"data\": {\n    \"name\": \"ticket\",\n    \"options\": [\n      {\n        \"name\": \"title\",\n        \"value\": \"Database optimization\"\n      },\n      {\n        \"name\": \"description\",\n        \"value\": \"Need to optimize database queries for better performance.\"\n      }\n    ]\n  }\n}"
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Ticket - Low Priority",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-signature-ed25519",
+            "value": "mock_signature"
+          },
+          {
+            "key": "x-signature-timestamp",
+            "value": "{{$timestamp}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/interactions-test",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "interactions-test"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"type\": 2,\n  \"data\": {\n    \"name\": \"ticket\",\n    \"options\": [\n      {\n        \"name\": \"title\",\n        \"value\": \"Update documentation\"\n      },\n      {\n        \"name\": \"description\",\n        \"value\": \"API documentation needs to be updated with the latest endpoints.\"\n      },\n      {\n        \"name\": \"tag\",\n        \"value\": \"back-end\"\n      },\n      {\n        \"name\": \"priority\",\n        \"value\": \"Low\"\n      }\n    ]\n  }\n}"
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Invalid Signature Test",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-signature-ed25519",
+            "value": "invalid_signature"
+          },
+          {
+            "key": "x-signature-timestamp",
+            "value": "{{$timestamp}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/interactions",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "interactions"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"type\": 2,\n  \"data\": {\n    \"name\": \"ticket\",\n    \"options\": [\n      {\n        \"name\": \"title\",\n        \"value\": \"Test ticket\"\n      },\n      {\n        \"name\": \"description\",\n        \"value\": \"This should fail due to invalid signature\"\n      }\n    ]\n  }\n}"
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Unknown Command Test",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-signature-ed25519",
+            "value": "mock_signature"
+          },
+          {
+            "key": "x-signature-timestamp",
+            "value": "{{$timestamp}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/interactions-test",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "interactions-test"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"type\": 2,\n  \"data\": {\n    \"name\": \"unknown\",\n    \"options\": []\n  }\n}"
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// For testing purposes, signature verification is bypassed in test endpoint",
+          "// The test endpoint will accept 'mock_signature' as a valid signature"
+        ]
+      }
+    }
+  ]
+}
